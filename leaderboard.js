@@ -54,10 +54,16 @@ async function renderLeaderboard() {
       return;
     }
 
+    const medals = ["🥇", "🥈", "🥉"];
+
     let html = "<h3>Classement (parties gagnées)</h3><ol>";
+    let rank = 0;
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
-      html += `<li>${data.name} — ${data.gamesWon}/${data.gamesPlayed} partie(s) gagnée(s)</li>`;
+      const medal = medals[rank] || "";
+      const topClass = rank < 3 ? " class=\"topRank\"" : "";
+      html += `<li${topClass}>${medal} ${data.name} — ${data.gamesWon}/${data.gamesPlayed} partie(s) gagnée(s)</li>`;
+      rank++;
     });
     html += "</ol>";
     leaderboardEl.innerHTML = html;
