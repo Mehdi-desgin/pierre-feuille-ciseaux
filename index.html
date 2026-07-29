@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pierre Feuille Ciseaux</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 60px auto;
+      text-align: center;
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 30px 0;
+    }
+
+    .choiceBtn {
+      font-size: 40px;
+      padding: 16px 20px;
+      cursor: pointer;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      background: #f9f9f9;
+    }
+
+    .choiceBtn:hover {
+      background: #eee;
+    }
+
+    #result {
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 30px;
+      margin: 20px 0;
+    }
+
+    #roundDetail {
+      font-size: 16px;
+      color: #666;
+      min-height: 20px;
+    }
+
+    #score {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+
+    #resetBtn {
+      margin-top: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #roundCounter {
+      font-size: 14px;
+      color: #666;
+    }
+
+    #finalResult {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 10px;
+      min-height: 30px;
+    }
+
+    .choiceBtn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #history {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    #history li {
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pierre Feuille Ciseaux</h1>
+
+  <p id="roundCounter">Manche 1/5</p>
+
+  <div class="choices">
+    <button class="choiceBtn" data-choice="pierre">🪨</button>
+    <button class="choiceBtn" data-choice="feuille">📄</button>
+    <button class="choiceBtn" data-choice="ciseaux">✂️</button>
+  </div>
+
+  <div id="result"></div>
+  <div id="roundDetail"></div>
+
+  <div id="score">
+    <span id="winsCount">Victoires : 0</span>
+    <span id="lossesCount">Défaites : 0</span>
+    <span id="tiesCount">Égalités : 0</span>
+  </div>
+
+  <div id="finalResult"></div>
+
+  <button id="resetBtn">Nouvelle partie</button>
+
+  <ul id="history"></ul>
+
+  <script src="script.js"></script>
+</body>
+</html>
