@@ -1,0 +1,72 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAxWF8Ag8VDqu574AGzxQrME6Pmm3puEFY",
+  authDomain: "pierre-feuille-ciseaux-68650.firebaseapp.com",
+  projectId: "pierre-feuille-ciseaux-68650",
+  storageBucket: "pierre-feuille-ciseaux-68650.firebasestorage.app",
+  messagingSenderId: "944445613907",
+  appId: "1:944445613907:web:098e2ea845ae0a8c3163a6",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const leaderboardEl = document.getElementById("leaderboard");
+
+async function updateLeaderboard(playerName, gameWon) {
+  if (!playerName) return;
+
+  const playerRef = doc(db, "players", playerName);
+  const snapshot = await getDoc(playerRef);
+  const current = snapshot.exists() ? snapshot.data() : { gamesPlayed: 0, gamesWon: 0 };
+
+  await setDoc(playerRef, {
+    name: playerName,
+    gamesPlayed: current.gamesPlayed + 1,
+    gamesWon: current.gamesWon + (gameWon ? 1 : 0),
+  });
+
+  renderLeaderboard();
+}
+
+async function renderLeaderboard() {
+  if (!leaderboardEl) return;
+  leaderboardEl.innerHTML = "<h3>Classement</h3><p>Chargement...</p>";
+
+  try {
+    const playersQuery = query(collection(db, "players"), orderBy("gamesWon", "desc"), limit(10));
+    const snapshot = await getDocs(playersQuery);
+
+    if (snapshot.empty) {
+      leaderboardEl.innerHTML = "<h3>Classement</h3><p>Aucun joueur pour l'instant.</p>";
+      return;
+    }
+
+    let html = "<h3>Classement (parties gagnées)</h3><ol>";
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      html += `<li>${data.name} — ${data.gamesWon}/${data.gamesPlayed} partie(s) gagnée(s)</li>`;
+    });
+    html += "</ol>";
+    leaderboardEl.innerHTML = html;
+  } catch (err) {
+    leaderboardEl.innerHTML = "<h3>Classement</h3><p>Impossible de charger le classement.</p>";
+    console.error(err);
+  }
+}
+
+window.updateLeaderboard = updateLeaderboard;
+
+renderLeaderboard();

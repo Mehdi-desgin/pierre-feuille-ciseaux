@@ -12,6 +12,12 @@ const globalStats = document.getElementById("globalStats");
 const lengthSelect = document.getElementById("lengthSelect");
 const resetStatsBtn = document.getElementById("resetStatsBtn");
 const themeToggle = document.getElementById("themeToggle");
+const playerNameInput = document.getElementById("playerNameInput");
+
+playerNameInput.value = localStorage.getItem("pfcPlayerName") || "";
+playerNameInput.addEventListener("input", () => {
+  localStorage.setItem("pfcPlayerName", playerNameInput.value.trim());
+});
 
 const emojis = { pierre: "🪨", feuille: "📄", ciseaux: "✂️" };
 const beats = { pierre: "ciseaux", feuille: "pierre", ciseaux: "feuille" };
@@ -137,7 +143,8 @@ function endGame() {
   roundCounter.textContent = "Partie terminée";
 
   stats.gamesPlayed++;
-  if (wins > losses) {
+  const gameWon = wins > losses;
+  if (gameWon) {
     finalResult.textContent = "🏆 Vous avez gagné la partie !";
     stats.gamesWon++;
   } else if (losses > wins) {
@@ -147,6 +154,11 @@ function endGame() {
   }
   saveStats();
   renderGlobalStats();
+
+  const playerName = playerNameInput.value.trim();
+  if (playerName && window.updateLeaderboard) {
+    window.updateLeaderboard(playerName, gameWon);
+  }
 }
 
 function addToHistory(playerChoice, computerChoice, outcome) {
