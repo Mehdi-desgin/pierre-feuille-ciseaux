@@ -9,11 +9,12 @@ const roundCounter = document.getElementById("roundCounter");
 const finalResult = document.getElementById("finalResult");
 const history = document.getElementById("history");
 const globalStats = document.getElementById("globalStats");
+const lengthSelect = document.getElementById("lengthSelect");
 
 const emojis = { pierre: "🪨", feuille: "📄", ciseaux: "✂️" };
 const beats = { pierre: "ciseaux", feuille: "pierre", ciseaux: "feuille" };
-const MAX_ROUNDS = 5;
 
+let maxRounds = Number(lengthSelect.value);
 let wins = 0;
 let losses = 0;
 let ties = 0;
@@ -68,10 +69,11 @@ function playSound(outcome) {
 }
 
 function playRound(playerChoice) {
-  if (roundsPlayed >= MAX_ROUNDS || isAnimating) return;
+  if (roundsPlayed >= maxRounds || isAnimating) return;
 
   isAnimating = true;
   choiceBtns.forEach((btn) => (btn.disabled = true));
+  lengthSelect.disabled = true;
   result.textContent = "";
 
   if (audioCtx.state === "suspended") audioCtx.resume();
@@ -120,10 +122,10 @@ function finishRound(playerChoice, computerChoice) {
   updateScore();
   isAnimating = false;
 
-  if (roundsPlayed >= MAX_ROUNDS) {
+  if (roundsPlayed >= maxRounds) {
     endGame();
   } else {
-    roundCounter.textContent = `Manche ${roundsPlayed + 1}/${MAX_ROUNDS}`;
+    roundCounter.textContent = `Manche ${roundsPlayed + 1}/${maxRounds}`;
     choiceBtns.forEach((btn) => (btn.disabled = false));
   }
 }
@@ -163,6 +165,11 @@ choiceBtns.forEach((btn) => {
   });
 });
 
+lengthSelect.addEventListener("change", () => {
+  maxRounds = Number(lengthSelect.value);
+  roundCounter.textContent = `Manche 1/${maxRounds}`;
+});
+
 renderGlobalStats();
 
 resetBtn.addEventListener("click", () => {
@@ -171,11 +178,13 @@ resetBtn.addEventListener("click", () => {
   ties = 0;
   roundsPlayed = 0;
   isAnimating = false;
+  maxRounds = Number(lengthSelect.value);
   result.textContent = "";
   roundDetail.textContent = "";
   finalResult.textContent = "";
-  roundCounter.textContent = `Manche 1/${MAX_ROUNDS}`;
+  roundCounter.textContent = `Manche 1/${maxRounds}`;
   choiceBtns.forEach((btn) => (btn.disabled = false));
+  lengthSelect.disabled = false;
   history.innerHTML = "";
   updateScore();
 });
