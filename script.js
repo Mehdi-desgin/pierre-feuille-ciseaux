@@ -10,6 +10,7 @@ const finalResult = document.getElementById("finalResult");
 const history = document.getElementById("history");
 const globalStats = document.getElementById("globalStats");
 const lengthSelect = document.getElementById("lengthSelect");
+const resetStatsBtn = document.getElementById("resetStatsBtn");
 
 const emojis = { pierre: "🪨", feuille: "📄", ciseaux: "✂️" };
 const beats = { pierre: "ciseaux", feuille: "pierre", ciseaux: "feuille" };
@@ -163,6 +164,17 @@ choiceBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
     playRound(btn.dataset.choice);
   });
+});
+
+resetStatsBtn.addEventListener("click", () => {
+  if (!confirm("Réinitialiser les statistiques globales (toutes parties confondues) ?")) return;
+  stats.totalWins = 0;
+  stats.totalLosses = 0;
+  stats.totalTies = 0;
+  stats.gamesPlayed = 0;
+  stats.gamesWon = 0;
+  saveStats();
+  renderGlobalStats();
 });
 
 lengthSelect.addEventListener("change", () => {
