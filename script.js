@@ -11,6 +11,7 @@ const history = document.getElementById("history");
 const globalStats = document.getElementById("globalStats");
 const lengthSelect = document.getElementById("lengthSelect");
 const resetStatsBtn = document.getElementById("resetStatsBtn");
+const themeToggle = document.getElementById("themeToggle");
 
 const emojis = { pierre: "🪨", feuille: "📄", ciseaux: "✂️" };
 const beats = { pierre: "ciseaux", feuille: "pierre", ciseaux: "feuille" };
@@ -175,6 +176,19 @@ resetStatsBtn.addEventListener("click", () => {
   stats.gamesWon = 0;
   saveStats();
   renderGlobalStats();
+});
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeToggle.textContent = theme === "dark" ? "☀️ Mode clair" : "🌙 Mode sombre";
+}
+
+applyTheme(localStorage.getItem("pfcTheme") || "light");
+
+themeToggle.addEventListener("click", () => {
+  const newTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("pfcTheme", newTheme);
+  applyTheme(newTheme);
 });
 
 lengthSelect.addEventListener("change", () => {

@@ -5,11 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pierre Feuille Ciseaux</title>
   <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111111;
+      --border: #dddddd;
+      --button-bg: #f9f9f9;
+      --button-hover: #eeeeee;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1e1e1e;
+      --text: #f0f0f0;
+      --border: #444444;
+      --button-bg: #2c2c2c;
+      --button-hover: #3a3a3a;
+    }
+
     body {
       font-family: sans-serif;
       max-width: 500px;
       margin: 60px auto;
       text-align: center;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    select, button {
+      background: var(--button-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
 
     .choices {
@@ -23,13 +47,13 @@
       font-size: 40px;
       padding: 16px 20px;
       cursor: pointer;
-      border: 2px solid #ccc;
+      border: 2px solid var(--border);
       border-radius: 12px;
-      background: #f9f9f9;
+      background: var(--button-bg);
     }
 
     .choiceBtn:hover {
-      background: #eee;
+      background: var(--button-hover);
     }
 
     #result {
@@ -87,7 +111,7 @@
 
     #history li {
       padding: 6px 0;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
     }
@@ -95,7 +119,7 @@
     #globalStats {
       margin-top: 24px;
       padding: 12px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 14px;
       text-align: left;
@@ -109,6 +133,8 @@
 </head>
 <body>
   <h1>Pierre Feuille Ciseaux</h1>
+
+  <button id="themeToggle">🌙 Mode sombre</button>
 
   <label for="lengthSelect">Longueur de la partie : </label>
   <select id="lengthSelect">
