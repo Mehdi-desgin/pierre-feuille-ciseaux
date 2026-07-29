@@ -91,6 +91,20 @@
       display: flex;
       justify-content: space-between;
     }
+
+    #globalStats {
+      margin-top: 24px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: left;
+    }
+
+    #globalStats h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+    }
   </style>
 </head>
 <body>
@@ -118,6 +132,8 @@
   <button id="resetBtn">Nouvelle partie</button>
 
   <ul id="history"></ul>
+
+  <div id="globalStats"></div>
 
   <script src="script.js"></script>
 </body>
