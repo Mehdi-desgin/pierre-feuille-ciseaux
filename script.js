@@ -138,6 +138,22 @@ function finishRound(playerChoice, computerChoice) {
   }
 }
 
+function launchConfetti() {
+  const colors = ["#e63946", "#f4a340", "#4caf87", "#3a86ff", "#ffbe0b"];
+
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.style.left = `${Math.random() * 100}vw`;
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
+    piece.style.opacity = String(0.7 + Math.random() * 0.3);
+    document.body.appendChild(piece);
+
+    piece.addEventListener("animationend", () => piece.remove());
+  }
+}
+
 function endGame() {
   choiceBtns.forEach((btn) => (btn.disabled = true));
   roundCounter.textContent = "Partie terminée";
@@ -147,6 +163,7 @@ function endGame() {
   if (gameWon) {
     finalResult.textContent = "🏆 Vous avez gagné la partie !";
     stats.gamesWon++;
+    launchConfetti();
   } else if (losses > wins) {
     finalResult.textContent = "💀 Vous avez perdu la partie.";
   } else {
