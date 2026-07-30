@@ -25,15 +25,22 @@ const db = getFirestore(app);
 
 const leaderboardEl = document.getElementById("leaderboard");
 
+function normalizeName(playerName) {
+  return playerName.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
 async function updateLeaderboard(playerName, gameWon) {
   if (!playerName) return;
 
-  const playerRef = doc(db, "players", playerName);
+  const key = normalizeName(playerName);
+  if (!key) return;
+
+  const playerRef = doc(db, "players", key);
   const snapshot = await getDoc(playerRef);
   const current = snapshot.exists() ? snapshot.data() : { gamesPlayed: 0, gamesWon: 0 };
 
   await setDoc(playerRef, {
-    name: playerName,
+    name: playerName.trim().replace(/\s+/g, " "),
     gamesPlayed: current.gamesPlayed + 1,
     gamesWon: current.gamesWon + (gameWon ? 1 : 0),
   });
