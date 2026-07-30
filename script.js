@@ -76,6 +76,23 @@ function playSound(outcome) {
   }
 }
 
+function playGameEndSound(gameWon, gameTied) {
+  const now = audioCtx.currentTime;
+  if (gameWon) {
+    playTone(523, now, 0.15);
+    playTone(659, now + 0.15, 0.15);
+    playTone(784, now + 0.3, 0.15);
+    playTone(1047, now + 0.45, 0.35);
+  } else if (gameTied) {
+    playTone(400, now, 0.25);
+    playTone(400, now + 0.3, 0.25);
+  } else {
+    playTone(250, now, 0.3);
+    playTone(200, now + 0.3, 0.3);
+    playTone(150, now + 0.6, 0.5);
+  }
+}
+
 function playRound(playerChoice) {
   if (roundsPlayed >= maxRounds || isAnimating) return;
 
@@ -160,6 +177,7 @@ function endGame() {
 
   stats.gamesPlayed++;
   const gameWon = wins > losses;
+  const gameTied = wins === losses;
   if (gameWon) {
     finalResult.textContent = "🏆 Vous avez gagné la partie !";
     stats.gamesWon++;
@@ -169,6 +187,7 @@ function endGame() {
   } else {
     finalResult.textContent = "🤝 Match nul !";
   }
+  playGameEndSound(gameWon, gameTied);
   saveStats();
   renderGlobalStats();
 
