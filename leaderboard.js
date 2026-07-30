@@ -47,6 +47,18 @@ async function updateLeaderboard(playerName, gameWon) {
   });
 
   renderLeaderboard();
+  renderPlayerRank(playerName);
+}
+
+async function getRankedPlayers() {
+  const playersQuery = query(collection(db, "players"), orderBy("gamesPlayed", "desc"), limit(100));
+  const snapshot = await getDocs(playersQuery);
+
+  return snapshot.docs
+    .map((docSnap) => docSnap.data())
+    .filter((data) => data.gamesPlayed >= MIN_GAMES_FOR_RANKING)
+    .map((data) => ({ ...data, winRate: data.gamesWon / data.gamesPlayed }))
+    .sort((a, b) => b.winRate - a.winRate);
 }
 
 async function renderLeaderboard() {
@@ -54,20 +66,7 @@ async function renderLeaderboard() {
   leaderboardEl.innerHTML = "<h3>Classement</h3><p>Chargement...</p>";
 
   try {
-    const playersQuery = query(collection(db, "players"), orderBy("gamesPlayed", "desc"), limit(100));
-    const snapshot = await getDocs(playersQuery);
-
-    if (snapshot.empty) {
-      leaderboardEl.innerHTML = "<h3>Classement</h3><p>Aucun joueur pour l'instant.</p>";
-      return;
-    }
-
-    const players = snapshot.docs
-      .map((docSnap) => docSnap.data())
-      .filter((data) => data.gamesPlayed >= MIN_GAMES_FOR_RANKING)
-      .map((data) => ({ ...data, winRate: data.gamesWon / data.gamesPlayed }))
-      .sort((a, b) => b.winRate - a.winRate)
-      .slice(0, 10);
+    const players = await getRankedPlayers();
 
     if (players.length === 0) {
       leaderboardEl.innerHTML = `<h3>Classement</h3><p>Aucun joueur avec au moins ${MIN_GAMES_FOR_RANKING} parties jouées pour l'instant.</p>`;
@@ -77,7 +76,7 @@ async function renderLeaderboard() {
     const medals = ["🥇", "🥈", "🥉"];
 
     let html = "<h3>Classement (taux de victoire)</h3><ol>";
-    players.forEach((data, rank) => {
+    players.slice(0, 10).forEach((data, rank) => {
       const medal = medals[rank] || "";
       const topClass = rank < 3 ? " class=\"topRank\"" : "";
       const percent = Math.round(data.winRate * 100);
@@ -91,6 +90,44 @@ async function renderLeaderboard() {
   }
 }
 
+async function renderPlayerRank(playerName) {
+  const playerRankEl = document.getElementById("playerRank");
+  if (!playerRankEl) return;
+
+  const key = normalizeName(playerName || "");
+  if (!key) {
+    playerRankEl.textContent = "";
+    return;
+  }
+
+  playerRankEl.textContent = "Recherche de votre classement...";
+
+  try {
+    const players = await getRankedPlayers();
+    const index = players.findIndex((p) => normalizeName(p.name) === key);
+
+    if (index === -1) {
+      const playerRef = doc(db, "players", key);
+      const snapshot = await getDoc(playerRef);
+      const gamesPlayed = snapshot.exists() ? snapshot.data().gamesPlayed : 0;
+      const remaining = MIN_GAMES_FOR_RANKING - gamesPlayed;
+      playerRankEl.textContent =
+        remaining > 0
+          ? `Encore ${remaining} partie(s) à jouer pour apparaître au classement.`
+          : "Pas encore classé.";
+      return;
+    }
+
+    const player = players[index];
+    const percent = Math.round(player.winRate * 100);
+    playerRankEl.textContent = `Vous êtes classé #${index + 1} (${percent}% de victoires).`;
+  } catch (err) {
+    playerRankEl.textContent = "";
+    console.error(err);
+  }
+}
+
 window.updateLeaderboard = updateLeaderboard;
+window.renderPlayerRank = renderPlayerRank;
 
 renderLeaderboard();

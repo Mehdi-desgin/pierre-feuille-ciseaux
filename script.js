@@ -15,9 +15,21 @@ const themeToggle = document.getElementById("themeToggle");
 const playerNameInput = document.getElementById("playerNameInput");
 
 playerNameInput.value = localStorage.getItem("pfcPlayerName") || "";
+
+let playerRankTimeout = null;
+function refreshPlayerRank() {
+  clearTimeout(playerRankTimeout);
+  playerRankTimeout = setTimeout(() => {
+    if (window.renderPlayerRank) window.renderPlayerRank(playerNameInput.value.trim());
+  }, 500);
+}
+
 playerNameInput.addEventListener("input", () => {
   localStorage.setItem("pfcPlayerName", playerNameInput.value.trim());
+  refreshPlayerRank();
 });
+
+window.addEventListener("load", refreshPlayerRank);
 
 const emojis = { pierre: "🪨", feuille: "📄", ciseaux: "✂️" };
 const beats = { pierre: "ciseaux", feuille: "pierre", ciseaux: "feuille" };
