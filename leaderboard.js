@@ -24,6 +24,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const leaderboardEl = document.getElementById("leaderboard");
+const MIN_GAMES_FOR_RANKING = 3;
 
 function normalizeName(playerName) {
   return playerName.trim().toLowerCase().replace(/\s+/g, " ");
@@ -53,7 +54,7 @@ async function renderLeaderboard() {
   leaderboardEl.innerHTML = "<h3>Classement</h3><p>Chargement...</p>";
 
   try {
-    const playersQuery = query(collection(db, "players"), orderBy("gamesWon", "desc"), limit(10));
+    const playersQuery = query(collection(db, "players"), orderBy("gamesPlayed", "desc"), limit(100));
     const snapshot = await getDocs(playersQuery);
 
     if (snapshot.empty) {
@@ -61,16 +62,26 @@ async function renderLeaderboard() {
       return;
     }
 
+    const players = snapshot.docs
+      .map((docSnap) => docSnap.data())
+      .filter((data) => data.gamesPlayed >= MIN_GAMES_FOR_RANKING)
+      .map((data) => ({ ...data, winRate: data.gamesWon / data.gamesPlayed }))
+      .sort((a, b) => b.winRate - a.winRate)
+      .slice(0, 10);
+
+    if (players.length === 0) {
+      leaderboardEl.innerHTML = `<h3>Classement</h3><p>Aucun joueur avec au moins ${MIN_GAMES_FOR_RANKING} parties jouées pour l'instant.</p>`;
+      return;
+    }
+
     const medals = ["🥇", "🥈", "🥉"];
 
-    let html = "<h3>Classement (parties gagnées)</h3><ol>";
-    let rank = 0;
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
+    let html = "<h3>Classement (taux de victoire)</h3><ol>";
+    players.forEach((data, rank) => {
       const medal = medals[rank] || "";
       const topClass = rank < 3 ? " class=\"topRank\"" : "";
-      html += `<li${topClass}>${medal} ${data.name} — ${data.gamesWon}/${data.gamesPlayed} partie(s) gagnée(s)</li>`;
-      rank++;
+      const percent = Math.round(data.winRate * 100);
+      html += `<li${topClass}>${medal} ${data.name} — ${percent}% (${data.gamesWon}/${data.gamesPlayed} parties)</li>`;
     });
     html += "</ol>";
     leaderboardEl.innerHTML = html;
